@@ -22,7 +22,7 @@ $(foreach app,$(APPS),$(eval $(call EXPAND_VAR,$(app))))
 
 .PHONY : all clean
 
-CFLAGS  += 
+CFLAGS  += -Wall -g
 LDFLAGS +=
 
 all: $(OBJDIR) $(EXES)
