@@ -1,8 +1,9 @@
 
-APPS := triangle_matrix
+APPS := triangle_matrix padd
 OBJDIR := build
 
 triangle_matrix_SRCS := triangle_matrix.c
+padd_SRCS := padd.c
 
 ifndef OBJDIR
  $(error "OBJDIR is not defined. Aborting")
