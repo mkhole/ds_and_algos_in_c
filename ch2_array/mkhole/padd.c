@@ -9,6 +9,7 @@
 int method_flag = 0;
 void (*convert_to_array)(int *poly_coef, int **poly_array);
 void (*padd)(int *poly1, int *poly2, int **poly_result);
+void (*print_array)(int *poly_array);
 
 enum method_index {
 	INDEX_1 = 1,
@@ -79,6 +80,18 @@ void padd_1(int *poly1, int *poly2, int **poly_result)
 	(*poly_result)[0] = (res_i - 1) / 2;
 }
 
+void padd_2(int *poly1, int *poly2, int **poly_result)
+{
+	int i;
+
+	*poly_result = (int *)calloc(POLY_SIZE + 1, sizeof(int));
+	(*poly_result)[0] = POLY_SIZE - 1;
+
+	for (i = 1; i <= POLY_SIZE; i++) {
+		(*poly_result)[i] = poly1[i]  + poly2[i];
+	}
+}
+
 void convert_to_array_1(int *poly_coef, int **poly_array)
 {
 	int i, count;
@@ -90,7 +103,6 @@ void convert_to_array_1(int *poly_coef, int **poly_array)
 	}
 
 	*poly_array = (int *)calloc((count * 2) + 1, sizeof(int));
-
 	(*poly_array)[0] = count;
 
 	count = 1;
@@ -100,13 +112,33 @@ void convert_to_array_1(int *poly_coef, int **poly_array)
 			(*poly_array)[count++] = poly_coef[i];
 		}
 	}
-
 }
 
-void print_array(int *poly_array)
+void convert_to_array_2(int *poly_coef, int **poly_array)
+{
+	int i;
+
+	*poly_array = (int *)calloc(POLY_SIZE + 1, sizeof(int));
+	(*poly_array)[0] = POLY_SIZE - 1;
+
+	for (i = POLY_SIZE; i >= 1; i--) {
+		(*poly_array)[i] =  poly_coef[POLY_SIZE - i];
+	}
+}
+
+void print_array_1(int *poly_array)
 {
 	int i;
 	for (i = 0; i < (poly_array[0] * 2) + 1; i++) {
+		printf("%2d ", poly_array[i]);
+	}
+	printf("\n");
+}
+
+void print_array_2(int *poly_array)
+{
+	int i;
+	for (i = 0; i < (POLY_SIZE + 1); i++) {
 		printf("%2d ", poly_array[i]);
 	}
 	printf("\n");
@@ -129,10 +161,14 @@ int parse_method(int argc, char **argv)
 
 	if (!strcmp(argv[1], "1")) {
 		method_flag = INDEX_1;
-		convert_to_array = convert_to_array_1;
-		padd = padd_1;
+		convert_to_array = &convert_to_array_1;
+		padd = &padd_1;
+		print_array = &print_array_1;
 	} else if (!strcmp(argv[1], "2")) {
 		method_flag = INDEX_2;
+		convert_to_array = &convert_to_array_2;
+		padd = &padd_2;
+		print_array = &print_array_2;
 	}
 
 	return (method_flag != 0);
@@ -166,7 +202,7 @@ int main(int argc, char **argv)
 	}
 
 	/* Convert to array */
-	if(convert_to_array == NULL) {
+	if (convert_to_array == NULL) {
 		printf("func: convert_to_array is NULL\n");
 		return 0;
 	}
@@ -176,12 +212,18 @@ int main(int argc, char **argv)
 	}
 
 	/* Print the array */
+
+	if (print_array == NULL) {
+		printf("func: print_array is NULL\n");
+		return 0;
+	}
+
 	for (i = 0; i < 2; i++) {
 		printf("array%d = ", i);
 		print_array(poly_array[i]);
 	}
 
-	if(padd == NULL) {
+	if (padd == NULL) {
 		printf("func: padd is NULL\n");
 		return 0;
 	}
